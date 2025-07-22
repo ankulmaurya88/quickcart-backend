@@ -1,35 +1,29 @@
-# Business logic for user
-# users/service.py
-from passlib.context import CryptContext
+from app.core.database import db
+from app.modules.users.model import UserModel
+from app.modules.users.schemas import UserCreate
+from app.core.security import hash_password, verify_password
 from bson import ObjectId
-from pymongo.collection import Collection
-from app.core.security import create_access_token
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+user_collection = db.get_collection("users")
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+async def create_user(user_data: UserCreate) -> UserModel:
+    user_dict = user_data.dict()
+    user_dict["hashed_password"] = hash_password(user_dict.pop("password"))
+    user_dict["is_active"] = True
+    user_dict["is_admin"] = False
 
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    result = await user_collection.insert_one(user_dict)
+    user_dict["_id"] = result.inserted_id
+    return UserModel(**user_dict)
 
-def register_user(user_data, user_collection: Collection):
-    user = user_collection.find_one({"email": user_data.email})
+async def get_user_by_email(email: str) -> UserModel:
+    user = await user_collection.find_one({"email": email})
     if user:
-        raise ValueError("User already exists")
-    
-    hashed = hash_password(user_data.password)
-    result = user_collection.insert_one({
-        "email": user_data.email,
-        "hashed_password": hashed
-    })
-    token = create_access_token({"sub": str(user_data.email)})
-    return {"email": user_data.email, "token": token}
+        return UserModel(**user)
+    return None
 
-def authenticate_user(user_data, user_collection: Collection):
-    user = user_collection.find_one({"email": user_data.email})
-    if not user or not verify_password(user_data.password, user["hashed_password"]):
-        raise ValueError("Invalid credentials")
-    
-    token = create_access_token({"sub": str(user_data.email)})
-    return {"email": user_data.email, "token": token}
+async def authenticate_user(email: str, password: str) -> UserModel:
+    user = await get_user_by_email(email)
+    if not user or not verify_password(password, user.hashed_password):
+        return None
+    return user

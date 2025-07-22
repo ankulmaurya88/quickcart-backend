@@ -2,8 +2,7 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from bson import ObjectId
 
-
-# Helper to handle ObjectId serialization
+# Custom ObjectId validator for Pydantic
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -19,11 +18,10 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
-
-# MongoDB User Document Schema
+# MongoDB User Model
 class UserModel(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
-    username: str
+    username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
     hashed_password: str
     is_active: bool = True
@@ -31,5 +29,16 @@ class UserModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {ObjectId: str}
         arbitrary_types_allowed = True
+        json_encoders = {
+            ObjectId: str
+        }
+        schema_extra = {
+            "example": {
+                "username": "john_doe",
+                "email": "john@example.com",
+                "hashed_password": "hashedpassword123",
+                "is_active": True,
+                "is_admin": False
+            }
+        }
