@@ -1,1 +1,29 @@
 # Dependencies
+# Web framework
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+
+# MongoDB async driver
+motor==3.4.0
+
+# Data validation
+pydantic==2.7.1
+
+# JWT Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Environment variable support
+python-dotenv==1.0.1
+
+# CORS middleware
+starlette==0.36.3
+
+# For ObjectId handling in Pydantic (if needed)
+pydantic-extra-types==2.7.0
+
+# Testing
+pytest==8.2.1
+httpx==0.27.0
+
+pymongo[srv]>=4.6.0
