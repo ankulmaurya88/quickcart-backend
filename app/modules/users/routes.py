@@ -6,9 +6,9 @@ from pymongo.collection import Collection
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/register", response_model=schemas.UserResponse)
-def register(user: schemas.UserCreate, user_collection: Collection = Depends(get_user_collection)):
+async def register(user: schemas.UserCreate, user_collection: Collection = Depends(get_user_collection)):
     try:
-        return service.register_user(user, user_collection)
+        return await service.create_user(user)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

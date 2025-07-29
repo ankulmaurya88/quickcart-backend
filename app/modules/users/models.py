@@ -15,7 +15,7 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema):
+    def __get_pydantic_json_schema__(cls, field_schema):
         field_schema.update(type="string")
 
 # MongoDB User Model
@@ -28,17 +28,17 @@ class UserModel(BaseModel):
     is_admin: bool = False
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str
         }
-        schema_extra = {
-            "example": {
-                "username": "john_doe",
-                "email": "john@example.com",
-                "hashed_password": "hashedpassword123",
-                "is_active": True,
-                "is_admin": False
-            }
+        json_schema_extra = {
+                "example": {
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "hashed_password": "hashedpassword123",
+                    "is_active": True,
+                    "is_admin": False
+                }
         }

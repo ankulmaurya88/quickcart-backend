@@ -1,5 +1,4 @@
-# Pydantic schemas for user
-# users/schemas.py
+
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 
@@ -20,4 +19,4 @@ class UserResponse(BaseModel):
     is_admin: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True

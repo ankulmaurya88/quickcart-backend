@@ -5,9 +5,9 @@ from fastapi import APIRouter
 # from app.modules.cart.routes import router as cart_router
 # from app.modules.orders.routes import router as orders_router
 
-from app.modules.users.routes import router as users_router  # current working module
+from app.modules.users.routes import router as users_router
 
-router = APIRouter()
+api_router = APIRouter()
 
 # Future route registrations (commented out for now)
 # router.include_router(products_router, prefix="/products", tags=["Products"])
@@ -15,4 +15,6 @@ router = APIRouter()
 # router.include_router(orders_router, prefix="/orders", tags=["Orders"])
 
 # Current auth/user routes
-router.include_router(users_router, prefix="/auth", tags=["Auth"])
+api_router.include_router(users_router, prefix="/auth", tags=["Auth"])
+api_router.include_router(users_router, prefix="/users", tags=["Users"])
+
